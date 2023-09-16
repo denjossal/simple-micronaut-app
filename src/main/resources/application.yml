@@ -1,0 +1,7 @@
+micronaut:
+  application:
+    name: poc
+  server:
+    port: 8080
+dynamodb:
+  table-name: 'counter'

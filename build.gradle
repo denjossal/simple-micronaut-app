@@ -1,0 +1,98 @@
+plugins {
+    id("io.micronaut.test-resources") version "4.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.0.3"
+    id("io.micronaut.aot") version "4.0.3"
+}
+
+version = "0.1"
+group = "example.micronaut"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    implementation ("com.amazonaws:aws-java-sdk-dynamodb:1.12.547")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut.aws:micronaut-aws-lambda-events-serde")
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    implementation("io.micronaut.validation:micronaut-validation")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("software.amazon.awssdk:dynamodb") {
+      exclude(group: "software.amazon.awssdk", module: "apache-client")
+      exclude(group: "software.amazon.awssdk", module: "netty-nio-client")
+    }
+    implementation("software.amazon.awssdk:url-connection-client")
+    compileOnly("org.graalvm.nativeimage:svm")
+    runtimeOnly("ch.qos.logback:logback-classic")
+    runtimeOnly("org.yaml:snakeyaml")
+
+
+}
+
+
+application {
+    mainClass.set("example.micronaut.Application")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+graalvmNative {
+    binaries {
+        main {
+            buildArgs "--initialize-at-build-time=\\\n" +
+                    "org.slf4j.impl.StaticLoggerBinder\\\n" +
+                    ",org.slf4j.LoggerFactory\\\n" +
+                    ",ch.qos.logback.classic.Logger\\\n" +
+                    ",ch.qos.logback.core.spi.AppenderAttachableImpl\\\n" +
+                    ",ch.qos.logback.core.status.StatusBase\\\n" +
+                    ",ch.qos.logback.classic.Level\\\n" +
+                    ",ch.qos.logback.core.status.InfoStatus\\\n" +
+                    ",ch.qos.logback.classic.PatternLayout\\\n" +
+                    ",ch.qos.logback.core.util.StatusPrinter\\\n" +
+                    ",ch.qos.logback.core.util.Loader\\\n" +
+                    ",example.micronaut.conf.CIAwsCredentialsProviderChainCondition\\\n" +
+                    ",example.micronaut.conf.CIAwsRegionProviderChainCondition\\\n" +
+                    ",ch.qos.logback.core.CoreConstants"
+        }
+    }
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("lambda_provided")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("example.micronaut.*")
+    }
+    aot {
+    // Please review carefully the optimizations enabled below
+    // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+    }
+}
+
+
+tasks.named("dockerfileNative") {
+    baseImage = "amazonlinux:2"
+    args(
+        "-XX:MaximumHeapSizePercent=80",
+        "-Dio.netty.allocator.numDirectArenas=0",
+        "-Dio.netty.noPreferDirect=true"
+    )
+}
+
+
+
