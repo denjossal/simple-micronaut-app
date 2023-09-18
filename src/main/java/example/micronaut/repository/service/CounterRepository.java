@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 denjossal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package example.micronaut.repository.service;
 
 import example.micronaut.conf.CIAwsCredentialsProviderChainCondition;
@@ -17,32 +33,26 @@ import java.util.*;
 
 @Requires(condition = CIAwsRegionProviderChainCondition.class)
 @Requires(condition = CIAwsCredentialsProviderChainCondition.class)
-@Requires(beans = { DynamoConfiguration.class, DynamoDbClient.class })
+@Requires(beans = {DynamoConfiguration.class, DynamoDbClient.class})
 @Primary
 @Singleton
 public class CounterRepository implements CounterRepositoryService {
 
+    protected static final String ATTRIBUTE_PK = "pointer";
+    protected static final String ATTRIBUTE_SK = "countNumber";
     private static final Logger LOG = LoggerFactory.getLogger(CounterRepository.class);
-
-    protected final DynamoDbClient dynamoDbClient;
-    protected final DynamoConfiguration dynamoConfiguration;
-
-    public CounterRepository(DynamoDbClient dynamoDbClient,
-                            DynamoConfiguration dynamoConfiguration) {
-        this.dynamoDbClient = dynamoDbClient;
-        this.dynamoConfiguration = dynamoConfiguration;
-    }
-
     private static final String TABLE_NAME = "counter";
     private static final String P_COLUMN = "pointer";
     private static final String P_COLUMN_VALUE = "key";
-
     private static final String S_COLUMN = "countNumber";
-
     private static final String S1_COLUMN = "c";
-
-    protected static final String ATTRIBUTE_PK = "pointer";
-    protected static final String ATTRIBUTE_SK = "countNumber";
+    protected final DynamoDbClient dynamoDbClient;
+    protected final DynamoConfiguration dynamoConfiguration;
+    public CounterRepository(DynamoDbClient dynamoDbClient,
+                             DynamoConfiguration dynamoConfiguration) {
+        this.dynamoDbClient = dynamoDbClient;
+        this.dynamoConfiguration = dynamoConfiguration;
+    }
 
     @Override
     public Optional<Counter> findById() {
@@ -63,13 +73,13 @@ public class CounterRepository implements CounterRepositoryService {
                 new Counter(
                         String.valueOf(getItemResponse.item().get(P_COLUMN).s()),
                         new BigInteger(String.valueOf(getItemResponse.item().get(S_COLUMN).n())),
-                        new BigInteger(String.valueOf(getItemResponse.item().get(S1_COLUMN).n()))));
+                        Integer.valueOf(String.valueOf(getItemResponse.item().get(S1_COLUMN).n()))));
     }
 
     @Override
     public Optional<Counter> save() {
         Counter stats = findById().orElseThrow();
-        Counter newCounter = new Counter(stats.getId(), stats.getCountNumber(), stats.getC().add(BigInteger.ONE));
+        Counter newCounter = new Counter(stats.getId(), stats.getCountNumber(), stats.getC() + 1);
 
         Map<String, AttributeValue> item = new HashMap<>();
         item.put(P_COLUMN, AttributeValue.builder().s(P_COLUMN_VALUE).build());
@@ -117,7 +127,7 @@ public class CounterRepository implements CounterRepositoryService {
                                 .attributeName(ATTRIBUTE_SK)
                                 .keyType(KeyType.RANGE)
                                 .build()
-                        ))
+                ))
                 .billingMode(BillingMode.PAY_PER_REQUEST)
                 .tableName(dynamoConfiguration.getTableName())
                 .build());

@@ -12,17 +12,18 @@ import java.io.File;
  */
 public class CIAwsCredentialsProviderChainCondition implements Condition {
     private static final Logger LOG = LoggerFactory.getLogger(CIAwsCredentialsProviderChainCondition.class);
+
     @Override
     public boolean matches(ConditionContext context) {
         if (System.getenv("CI") == null) {
             LOG.info("CI environment variable not present - Condition fulfilled");
             return true;
         }
-        if (System.getProperty("aws.accessKeyId") != null && System.getProperty("aws.secretAccessKey") !=null ) {
+        if (System.getProperty("aws.accessKeyId") != null && System.getProperty("aws.secretAccessKey") != null) {
             LOG.info("system properties aws.accessKeyId and aws.secretAccessKey present - Condition fulfilled");
             return true;
         }
-        if (System.getenv("AWS_ACCESS_KEY_ID") != null && System.getenv("AWS_SECRET_ACCESS_KEY") !=null ) {
+        if (System.getenv("AWS_ACCESS_KEY_ID") != null && System.getenv("AWS_SECRET_ACCESS_KEY") != null) {
             LOG.info("environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY present - Condition fulfilled");
             return true;
         }

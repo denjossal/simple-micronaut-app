@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 denjossal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package example.micronaut.conf.dynamodb;
 
 import io.micronaut.context.annotation.Primary;
@@ -13,18 +29,18 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Requires(property = "dynamodb-local.host") // <1>
-@Requires(property = "dynamodb-local.port") // <1>
-@Singleton // <2>
+@Requires(property = "dynamodb-local.host")
+@Requires(property = "dynamodb-local.port")
+@Singleton
 @Primary
 class DynamoDbClientBuilderListener
-        implements BeanCreatedEventListener<DynamoDbClientBuilder> { // <3>
+        implements BeanCreatedEventListener<DynamoDbClientBuilder> {
     private final URI endpoint;
     private final String accessKeyId;
     private final String secretAccessKey;
 
-    DynamoDbClientBuilderListener(@Value("${dynamodb-local.host}") String host, // <4>
-                                  @Value("${dynamodb-local.port}") String port) { // <4>
+    DynamoDbClientBuilderListener(@Value("${dynamodb-local.host}") String host,
+                                  @Value("${dynamodb-local.port}") String port) {
         try {
             this.endpoint = new URI("http://" + host + ":" + port);
         } catch (URISyntaxException e) {
