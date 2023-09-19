@@ -29,7 +29,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-@Requires(property = "dynamodb-local.host")
+@Requires(property = "localstack-local.host")
 @Requires(property = "dynamodb-local.port")
 @Singleton
 @Primary
@@ -39,7 +39,7 @@ class DynamoDbClientBuilderListener
     private final String accessKeyId;
     private final String secretAccessKey;
 
-    DynamoDbClientBuilderListener(@Value("${dynamodb-local.host}") String host,
+    DynamoDbClientBuilderListener(@Value("${localstack-local.host}") String host,
                                   @Value("${dynamodb-local.port}") String port) {
         try {
             this.endpoint = new URI("http://" + host + ":" + port);

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package example.micronaut.service.counter;
 
 import example.micronaut.repository.service.CounterRepository;
@@ -20,6 +21,8 @@ import io.micronaut.core.annotation.Introspected;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Singleton
 @Introspected
@@ -38,5 +41,11 @@ public class CounterServiceImpl implements CounterService {
         LOG.info("Updating counter....");
         LOG.info("CounterEntity {}", counterRepository.save().orElseThrow());
         LOG.info("Counter updated....");
+    }
+
+    public void saveRecords(ConcurrentLinkedQueue<String> concurrentLinkedQueue) {
+        for (int i = 0; i < concurrentLinkedQueue.size(); i++) {
+            updateCounter();
+        }
     }
 }

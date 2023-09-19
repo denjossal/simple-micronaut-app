@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package example.micronaut.service.counter;
+package example.micronaut.conf.sqs;
 
+import io.micronaut.jms.annotations.JMSProducer;
+import io.micronaut.jms.annotations.Queue;
+import io.micronaut.messaging.annotation.MessageBody;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import static io.micronaut.jms.sqs.configuration.SqsConfiguration.CONNECTION_FACTORY_BEAN_NAME;
 
-public interface CounterService {
+@JMSProducer(CONNECTION_FACTORY_BEAN_NAME)
+public interface SqsConfiguration {
 
-    void updateCounter();
-
-    void saveRecords(ConcurrentLinkedQueue<String> concurrentLinkedQueue);
-
+    @Queue("counter-sqs")
+    void send(@MessageBody String body);
 }

@@ -1,7 +1,12 @@
 micronaut:
   application:
-    name: poc
+    name: sqs
   server:
     port: 8080
+  jms:
+    sqs:
+      enabled: true
+sqs:
+  queue-name: 'counter-sqs'
 dynamodb:
   table-name: 'counter'

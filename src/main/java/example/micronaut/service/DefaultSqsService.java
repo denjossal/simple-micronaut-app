@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package example.micronaut.service.counter;
+package example.micronaut.service;
 
+import example.micronaut.conf.sqs.SqsConfiguration;
+import jakarta.inject.Singleton;
+import software.amazon.awssdk.services.sqs.SqsClient;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+@Singleton
+public class DefaultSqsService extends SqsService {
 
-public interface CounterService {
-
-    void updateCounter();
-
-    void saveRecords(ConcurrentLinkedQueue<String> concurrentLinkedQueue);
+    public DefaultSqsService(SqsClient sqsClient, SqsConfiguration sqsConfiguration) {
+        super(sqsClient, sqsConfiguration);
+    }
 
 }
