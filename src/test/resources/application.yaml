@@ -1,6 +1,0 @@
-micronaut:
-  application:
-    name: sqs
-  jms:
-    sqs:
-      enabled: true
