@@ -39,6 +39,7 @@ The file generated is under ```/build/libs/poc-0.1-lambda.zip```You can go to yo
       - ```git clone https://github.com/denjossal/simple-micronaut-app.git```
       - ```cd simple-micronaut-app```
       - ```./gradlew test```
+    - (Optional) check the enviroment variable 'AWS_REGION'
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
