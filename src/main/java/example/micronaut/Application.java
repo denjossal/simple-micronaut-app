@@ -36,7 +36,7 @@ public class Application {
         @Override
         public void configure(@NonNull ApplicationContextBuilder builder) {
             String env = System.getenv("STG");
-            if (null != env && env.length() > 0) {
+            if (null != env && !env.isEmpty()) {
                 builder.defaultEnvironments(FUNCTION);
             } else {
                 builder.defaultEnvironments(TEST);
